@@ -1,11 +1,7 @@
 {
   "functions": {
     "api/index.py": {
-      "includeFiles": [
-        "index.html",
-        "styles.css",
-        "app.js"
-      ]
+      "includeFiles": "{index.html,styles.css,app.js}"
     }
   },
   "rewrites": [
