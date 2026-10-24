@@ -201,6 +201,7 @@ h1 span { color: #6fb7f5; }
 .summary-button { min-height: 31px; padding: 0 10px; color: #d9eaff; background: #173151; border: 1px solid #2d5d88; border-radius: 5px; font-size: 9px; font-weight: 600; cursor: pointer; }
 .summary-button:hover:not(:disabled) { background: #1e4167; }
 .summary-button:disabled { color: #75869b; background: #172231; border-color: #29384b; cursor: not-allowed; }
+.report-download-button { white-space: nowrap; }
 .summary-privacy { margin: 10px 0 0; color: #8493a6; font-size: 9px; line-height: 1.6; }
 .summary-privacy strong { color: #d2b676; font-weight: 600; }
 .summary-message { margin-top: 8px; color: #7f91a7; font-size: 9px; line-height: 1.6; }

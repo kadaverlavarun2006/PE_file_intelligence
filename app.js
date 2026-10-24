@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const MAX_FILE_SIZE = 100 * 1024 * 1024;
+  let maxFileSize = 100 * 1024 * 1024;
   const HISTORY_KEY = "sentinel-pe-history-v1";
   const input = document.getElementById("file-input");
   const dropZone = document.getElementById("drop-zone");
@@ -9,11 +9,22 @@
   const selectedFileView = document.getElementById("selected-file");
   const errorView = document.getElementById("inline-error");
   const toast = document.getElementById("toast");
+  const uploadPrivacyLabel = document.querySelector(".drop-meta > span:first-child");
+  const uploadHelpLabel = document.querySelector(".upload-actions .helper-note span:last-child");
+  const headingServerLabel = document.querySelector(".heading-chip span");
   let selectedFile = null;
   let currentReport = null;
   let summaryEnabled = false;
   let toastTimer;
   let currentScanToken = 0;
+  const reportDownloadButton = document.createElement("button");
+  reportDownloadButton.type = "button";
+  reportDownloadButton.className = "summary-button report-download-button";
+  reportDownloadButton.textContent = "Download JSON report";
+  reportDownloadButton.addEventListener("click", downloadCurrentReport);
+  if (uploadPrivacyLabel) uploadPrivacyLabel.textContent = "UPLOADS SENT TO SERVER";
+  if (uploadHelpLabel) uploadHelpLabel.textContent = "Files are uploaded to the analysis server and removed after processing.";
+  if (headingServerLabel) headingServerLabel.textContent = "SERVER API";
 
   function formatBytes(bytes) {
     if (bytes < 1024) return `${bytes} B`;
@@ -25,6 +36,24 @@
       unit += 1;
     }
     return `${value.toFixed(value >= 10 ? 1 : 2)} ${units[unit]}`;
+  }
+
+  function downloadCurrentReport() {
+    if (!currentReport) return;
+    const report = {
+      ...currentReport,
+      analysis_completed_at: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const baseName = String(currentReport.file_name || "analysis")
+      .replace(/\.[^.]+$/, "")
+      .replace(/[^a-z0-9_-]+/gi, "_");
+    link.href = url;
+    link.download = `${baseName || "analysis"}-report.json`;
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   function escapeHtml(value) {
@@ -61,11 +90,11 @@
       showError("Only .exe and .dll files are supported.");
       return;
     }
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > maxFileSize) {
       selectedFile = null;
       selectedFileView.hidden = true;
       analyzeButton.disabled = true;
-      showError("This file exceeds the 100 MB size limit.");
+      showError(`This file exceeds the ${formatBytes(maxFileSize)} size limit.`);
       return;
     }
     selectedFile = file;
@@ -159,11 +188,12 @@
       '<div class="empty-data imports-empty">No imported DLLs were listed in the PE import directory.</div>';
 
     currentReport = report;
+    document.querySelector("#results-section .section-heading").append(reportDownloadButton);
     document.getElementById("summary-output").hidden = true;
     document.getElementById("summary-output").textContent = "";
     document.getElementById("summary-message").textContent = summaryEnabled
       ? "Optional: generate a plain-language explanation of the extracted evidence."
-      : "AI summary is disabled. Configure the optional API key on the Flask server to enable it.";
+      : "AI summary is disabled. Configure the optional API key on the server to enable it.";
     results.hidden = false;
     results.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -238,7 +268,7 @@
     } catch (error) {
       if (token !== currentScanToken) return;
       const message = error instanceof Error && error.message === "Failed to fetch"
-        ? "Could not connect to the local Flask server. Start it with your Python interpreter and try again."
+        ? "Could not connect to the analysis server. Please try again later."
         : error instanceof Error ? error.message : "An unexpected error occurred while analyzing this file.";
       showError(message);
       notify(message);
@@ -258,17 +288,24 @@
       const response = await fetch("/api/status");
       const status = await response.json();
       if (!response.ok) throw new Error(status.error || `Server returned HTTP ${response.status}.`);
+      const configuredMaxFileSize = Number(status.max_file_size);
+      if (Number.isSafeInteger(configuredMaxFileSize) && configuredMaxFileSize > 0) {
+        maxFileSize = configuredMaxFileSize;
+        const sizeLabel = document.querySelector(".drop-meta > span:last-child");
+        if (sizeLabel) sizeLabel.textContent = `MAX SIZE ${formatBytes(maxFileSize)}`;
+        if (selectedFile && selectedFile.size > maxFileSize) setFile(selectedFile);
+      }
       summaryEnabled = status.llm_summary_enabled === true;
       button.disabled = !summaryEnabled;
       button.textContent = summaryEnabled ? "Generate AI explanation" : "AI summary not configured";
       message.textContent = summaryEnabled
         ? "Optional: generate a plain-language explanation. Only extracted evidence—not the binary, filename, or hash—is sent to the configured API."
-        : "Optional LLM summary is off. Set SENTINEL_LLM_API_KEY on the Flask server and restart it to enable.";
+        : "Optional LLM summary is off. Set SENTINEL_LLM_API_KEY on the server to enable it.";
     } catch {
       summaryEnabled = false;
       button.disabled = true;
       button.textContent = "AI summary unavailable";
-      message.textContent = "Could not check the local Flask server's optional summary configuration.";
+      message.textContent = "Could not check the server's optional summary configuration.";
       message.classList.add("error");
     }
   }

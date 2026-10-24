@@ -19,7 +19,9 @@ from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 from werkzeug.utils import secure_filename
 
 APP_ROOT = Path(__file__).resolve().parent
-MAX_FILE_SIZE = 100 * 1024 * 1024
+MAX_FILE_SIZE = int(os.environ.get("SENTINEL_MAX_FILE_SIZE", str(100 * 1024 * 1024)))
+if MAX_FILE_SIZE <= 0:
+    raise ValueError("SENTINEL_MAX_FILE_SIZE must be a positive number of bytes.")
 MAX_REQUEST_SIZE = MAX_FILE_SIZE + 1024 * 1024
 ALLOWED_EXTENSIONS = {".exe", ".dll"}
 CHUNK_SIZE = 1024 * 1024
@@ -590,7 +592,10 @@ def _save_upload(upload, extension: str) -> tuple[Path, int, str]:
                     break
                 total += len(chunk)
                 if total > MAX_FILE_SIZE:
-                    raise UploadValidationError("File exceeds the 100 MB size limit.", 413)
+                    raise UploadValidationError(
+                        f"File exceeds the {MAX_FILE_SIZE / (1024 * 1024):g} MiB size limit.",
+                        413,
+                    )
                 digest.update(chunk)
                 temp_file.write(chunk)
         if total == 0:
