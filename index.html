@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d18">
+  <title>Sentinel PE — Threat Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="Sentinel PE home">
+        <span class="brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8 20 6v5.8c0 5-3.4 8.1-8 9.8-4.6-1.7-8-4.8-8-9.8V6l8-3.2Z"/><path d="m8.6 12 2.2 2.2 4.7-5"/></svg></span>
+        <span class="brand-copy"><strong>sentinel<span>pe</span></strong><small>THREAT INTELLIGENCE</small></span>
+      </a>
+
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="primary-nav" aria-label="Main navigation">
+        <a class="nav-item active" href="#analyzer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h7v7H4zM14 4h6v4h-6zM14 11h6v9h-6zM4 14h7v6H4z"/></svg><span>Analyzer</span><span class="nav-dot"></span></a>
+        <a class="nav-item" href="#history"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.2 2"/></svg><span>Scan history</span></a>
+      </nav>
+
+      <div class="sidebar-divider"></div>
+      <div class="nav-label">QUICK STATS</div>
+      <div class="side-stat"><span class="stat-icon blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span><span><small>FILES ANALYZED</small><strong id="sidebar-total">0</strong></span></div>
+      <div class="side-stat"><span class="stat-icon green"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span><span><small>SAFE FILES</small><strong id="sidebar-safe">0</strong></span></div>
+      <div class="side-stat"><span class="stat-icon red"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.8 20h18.4L12 3Z"/><path d="M12 9v5m0 3h.01"/></svg></span><span><small>FLAGGED</small><strong id="sidebar-flagged">0</strong></span></div>
+
+      <div class="sidebar-bottom">
+        <div class="privacy-card"><span class="privacy-shield"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v5.5c0 4.8-3.3 7.8-8 9.5-4.7-1.7-8-4.7-8-9.5V6l8-3Z"/><path d="m8.8 12 2.1 2.1 4.3-4.3"/></svg></span><div><strong>Local processing</strong><p>Files are sent to this local Flask server and deleted after analysis.</p></div></div>
+        <div class="sidebar-foot"><span class="status-pulse"></span> FLASK ANALYSIS API <span class="version">v1.0</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="analyzer">
+      <header class="topbar">
+        <div class="breadcrumb">WORKSPACE <span>/</span> <strong>PE ANALYZER</strong></div>
+        <div class="topbar-right"><span class="local-badge"><span class="status-pulse"></span> LOCAL SERVER</span><span class="topbar-divider"></span><span class="avatar">SA</span></div>
+      </header>
+
+      <div class="content-wrap">
+        <section class="page-heading">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span> STATIC FILE INSPECTION</div><h1>PE Threat <span>Analyzer</span></h1><p>Inspect Windows executables for suspicious indicators with local Flask-powered analysis.</p></div>
+          <div class="heading-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v5.5c0 4.8-3.3 7.8-8 9.5-4.7-1.7-8-4.7-8-9.5V6l8-3Z"/><path d="m8.8 12 2.1 2.1 4.3-4.3"/></svg><span>LOCAL SERVER</span></div>
+        </section>
+
+        <section class="upload-card panel" aria-labelledby="upload-title">
+          <div class="section-top"><div><div class="section-kicker">01 <span>·</span> NEW ANALYSIS</div><h2 id="upload-title">Upload a PE file</h2></div><span class="supported-tag">.EXE <i></i> .DLL</span></div>
+          <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-label="Choose a PE file or drop it here">
+            <input id="file-input" type="file" accept=".exe,.dll" hidden>
+            <div class="upload-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M5 14v5h14v-5"/></svg><span class="upload-spark">✦</span></div>
+            <div class="drop-copy"><strong>Drag &amp; drop your file here</strong><span>or <button id="browse-button" type="button">browse files</button> from your device</span></div>
+            <div class="drop-meta"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v5.5c0 4.8-3.3 7.8-8 9.5-4.7-1.7-8-4.7-8-9.5V6l8-3Z"/><path d="m8.8 12 2.1 2.1 4.3-4.3"/></svg> PRIVATE &amp; SECURE</span><span class="meta-separator"></span><span>MAX SIZE 100 MB</span></div>
+          </div>
+          <div class="selected-file" id="selected-file" hidden></div>
+          <div class="upload-actions"><div class="helper-note"><span class="info-mark">i</span><span>Files are sent to this local Flask server and removed after analysis.</span></div><button class="analyze-button" id="analyze-button" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 20 6v5.5c0 4.8-3.3 7.8-8 9.5-4.7-1.7-8-4.7-8-9.5V6l8-3Z"/><path d="m8.8 12 2.1 2.1 4.3-4.3"/></svg><span>Analyze file</span><span class="button-arrow">↗</span></button></div>
+          <div class="inline-error" id="inline-error" role="alert" hidden></div>
+        </section>
+
+        <div class="demo-notice"><span class="notice-mark">i</span><span><strong>Static analysis:</strong> Flask parses PE metadata with pefile and never executes uploads. Heuristics are not an AI model or antivirus engine and cannot establish that a file is safe.</span></div>
+
+        <section class="results-section" id="results-section" hidden aria-live="polite">
+          <div class="section-heading"><div><div class="section-kicker">02 <span>·</span> ANALYSIS REPORT</div><h2>Scan results</h2></div><span class="scan-time" id="scan-time"></span></div>
+          <div class="result-grid">
+            <article class="panel verdict-card" id="verdict-card">
+              <div class="card-topline"><span>THREAT ASSESSMENT</span><span class="result-status" id="result-status"></span></div>
+              <div class="verdict-main"><div class="risk-ring" id="risk-ring"><div class="risk-ring-inner"><strong id="risk-score">0</strong><span>RISK SCORE</span></div></div><div class="verdict-copy"><span class="verdict-label" id="verdict-label">ANALYSIS COMPLETE</span><h3 id="verdict-title">No assessment yet</h3><p id="verdict-description"></p></div></div>
+              <div class="risk-scale"><span>LOW RISK</span><div class="risk-track"><span id="risk-marker"></span></div><span>HIGH RISK</span></div>
+              <div class="scoring-note">Severity bands: low 0–24 · medium 25–49 · high 50–74 · critical 75–100. Heuristic findings do not prove malware.</div>
+              <div class="result-foot"><span><span class="mini-check">✓</span> Static analysis complete</span><span id="file-size-result"></span></div>
+            </article>
+            <article class="panel details-card">
+              <div class="card-topline"><span>FILE DETAILS</span><span class="detail-file-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v6h5M9 13h7m-7 4h7"/></svg></span></div>
+              <div class="file-name-result" id="result-file-name">—</div>
+              <div class="detail-list">
+                <div><span>File type</span><strong id="detail-type">—</strong></div><div><span>File size</span><strong id="detail-size">—</strong></div><div><span>Architecture</span><strong id="detail-arch">—</strong></div><div><span>Entry point</span><strong id="detail-entry">—</strong></div><div><span>Sections</span><strong id="detail-sections">—</strong></div><div><span>SHA-256</span><strong class="hash-value" id="detail-hash">—</strong></div>
+              </div>
+            </article>
+          </div>
+          <article class="panel indicators-card">
+            <div class="indicators-heading"><div><div class="section-kicker">SIGNAL BREAKDOWN</div><h3>Static indicators</h3></div><span class="indicator-caption">Heuristic signals · not a definitive verdict</span></div>
+            <div class="indicator-bars" id="indicator-bars"></div>
+            <div class="findings-wrap"><div class="findings-title"><span>OBSERVATIONS</span><span id="findings-count">0 SIGNALS</span></div><ul class="findings-list" id="findings-list"></ul></div>
+          </article>
+          <div class="extracted-grid">
+            <article class="panel extracted-card">
+              <div class="indicators-heading"><div><div class="section-kicker">PE STRUCTURE</div><h3>Sections &amp; entropy</h3></div><span class="indicator-caption">Static metadata</span></div>
+              <div class="data-table-wrap"><table><thead><tr><th>SECTION</th><th>VIRTUAL ADDRESS</th><th>VIRTUAL SIZE</th><th>RAW SIZE</th><th>ENTROPY</th></tr></thead><tbody id="sections-body"></tbody></table></div>
+            </article>
+            <article class="panel extracted-card">
+              <div class="indicators-heading"><div><div class="section-kicker">IMPORT DIRECTORY</div><h3>Imported DLLs &amp; functions</h3></div><span class="indicator-caption" id="import-count">0 DLLS</span></div>
+              <div class="imports-list" id="imports-list"></div>
+            </article>
+          </div>
+          <article class="panel ai-summary-card">
+            <div class="indicators-heading"><div><div class="section-kicker">OPTIONAL AI ASSISTANCE</div><h3>Evidence summary</h3></div><button class="summary-button" id="summary-button" type="button" disabled>Checking availability…</button></div>
+            <p class="summary-privacy" id="summary-privacy">When configured, only extracted PE metadata and triggered heuristic findings are sent to the server-configured API—never the binary, filename, or file hash. <strong>The summary is advisory and may be inaccurate.</strong></p>
+            <div class="summary-message" id="summary-message" role="status"></div>
+            <div class="summary-output" id="summary-output" hidden></div>
+          </article>
+        </section>
+
+        <section class="history-section" id="history">
+          <div class="section-heading history-heading"><div><div class="section-kicker">03 <span>·</span> RECENT ACTIVITY</div><h2>Analysis history</h2></div><button class="clear-history" id="clear-history" type="button" hidden>Clear history</button></div>
+          <div class="panel history-panel"><div class="history-table-wrap"><table><thead><tr><th>FILE NAME</th><th>DATE &amp; TIME</th><th>FILE SIZE</th><th>RISK</th><th>STATUS</th></tr></thead><tbody id="history-body"></tbody></table></div><div class="empty-history" id="empty-history"><span class="empty-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v6h5M9 13h7m-7 4h4"/></svg></span><strong>No scans yet</strong><span>Your recent file analyses will appear here.</span></div></div>
+        </section>
+        <footer class="page-footer"><span>Sentinel PE <span class="footer-dot">·</span> Flask + pefile</span><span>Static parsing only · uploads are never executed</span></footer>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
