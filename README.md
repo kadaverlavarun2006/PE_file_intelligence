@@ -13,7 +13,7 @@ Replace `<python>` with your Python interpreter. Open `http://127.0.0.1:5000/`. 
 
 ## Deploy to Vercel
 
-The repository includes the Vercel Python function entry point (`api/index.py`) and routing/configuration (`vercel.json`). To deploy:
+The repository exposes the Flask application from `app.py`; `vercel.json` includes the UI assets in the Flask function bundle and sets the Python dependency install command. To deploy:
 
 1. Push the project to a GitHub repository. Do not commit `.venv`.
 2. In Vercel, choose **Add New → Project**, import the repository, and deploy with the detected Python runtime. No API key is needed for PE analysis.

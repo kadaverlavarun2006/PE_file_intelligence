@@ -1,11 +1,8 @@
 {
   "installCommand": "python -m pip install -r requirements.txt",
   "functions": {
-    "api/index.py": {
+    "app.py": {
       "includeFiles": "{index.html,styles.css,app.js}"
     }
-  },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index.py" }
-  ]
+  }
 }
