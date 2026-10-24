@@ -1,4 +1,5 @@
 {
+  "installCommand": "python -m pip install -r requirements.txt",
   "functions": {
     "api/index.py": {
       "includeFiles": "{index.html,styles.css,app.js}"
